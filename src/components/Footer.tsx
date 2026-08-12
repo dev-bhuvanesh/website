@@ -29,8 +29,8 @@ function Footer() {
         <div>
           <p className="text-lg font-bold tracking-tight text-primary">{profile.name}</p>
           <p className="mt-2 max-w-xs text-sm leading-relaxed text-text-secondary">
-            {profile.title} at {profile.university}, researching AI, machine learning, and
-            computer vision.
+            {profile.university}, {profile.secondaryRole.organization},{" "}
+            {profile.secondaryRole.location}. {profile.title}.
           </p>
         </div>
 

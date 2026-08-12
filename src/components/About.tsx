@@ -48,9 +48,9 @@ function About() {
           <motion.div {...fadeUp} transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}>
             <h3 className="text-lg font-bold text-text-primary">Research Interests</h3>
             <p className="mt-3 text-base leading-relaxed text-text-secondary">
-              Robust and interpretable machine learning, uncertainty quantification in deep
-              vision models, self-supervised representation learning, and applied AI systems for
-              healthcare and scientific discovery.
+              Commerce, social service, education, and community development, alongside
+              multidisciplinary research through the Benevolent International Journal of
+              Multidisciplinary Research (BIJMR).
             </p>
           </motion.div>
         </div>

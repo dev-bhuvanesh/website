@@ -6,8 +6,6 @@ import Footer from "../components/Footer";
 import Hero from "../components/Hero";
 import Navbar from "../components/Navbar";
 import RecentAwards from "../components/RecentAwards";
-import RecentPublications from "../components/RecentPublications";
-import Stats from "../components/Stats";
 
 function Profile() {
   const location = useLocation();
@@ -26,8 +24,6 @@ function Profile() {
       <main>
         <Hero />
         <About />
-        <Stats />
-        <RecentPublications />
         <RecentAwards />
         <ContactPreview />
       </main>

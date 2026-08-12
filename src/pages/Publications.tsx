@@ -135,15 +135,23 @@ function Publications() {
             </div>
           ) : (
             <div className="mt-16 flex flex-col items-center gap-3 rounded-card border border-border bg-surface px-6 py-16 text-center">
-              <p className="text-lg font-bold text-text-primary">No publications found</p>
-              <p className="text-sm text-text-secondary">Try changing your search or filters.</p>
-              <button
-                type="button"
-                onClick={clearFilters}
-                className="mt-3 rounded-button border border-primary px-5 py-2.5 text-sm font-semibold text-primary transition-colors duration-200 hover:bg-primary hover:text-white"
-              >
-                Clear Filters
-              </button>
+              <p className="text-lg font-bold text-text-primary">
+                {publications.length === 0 ? "Publications coming soon" : "No publications found"}
+              </p>
+              <p className="text-sm text-text-secondary">
+                {publications.length === 0
+                  ? "This list is being compiled. Check back soon."
+                  : "Try changing your search or filters."}
+              </p>
+              {publications.length > 0 && (
+                <button
+                  type="button"
+                  onClick={clearFilters}
+                  className="mt-3 rounded-button border border-primary px-5 py-2.5 text-sm font-semibold text-primary transition-colors duration-200 hover:bg-primary hover:text-white"
+                >
+                  Clear Filters
+                </button>
+              )}
             </div>
           )}
         </div>

@@ -8,16 +8,10 @@ export interface EducationItem {
   year?: string;
 }
 
-export interface ExperienceItem {
-  role: string;
-  institution: string;
-  period: string;
-}
-
 export interface Award {
   id: string;
   name: string;
-  organization: string;
+  organization?: string;
   year: string;
 }
 
@@ -32,20 +26,20 @@ export const profile = {
   title: "Assistant Professor",
   university: "Founder & Managing Trustee",
   secondaryRole: {
-    title: "Chief Executive Officer",
+    title: "Founder & Managing Trustee",
     organization: "Benevolent Trust",
     location: "Puducherry",
   },
-  department: "Department of Computer Science & Engineering",
+  department: "Benevolent Trust, Puducherry",
   office: "Benevolent Trust, Puducherry",
   email: "benevolenttrust@gmail.com",
   phone: "+91 96293 16672",
   address: "Pondicherry, Puducherry, India",
   cvUrl: "#",
   intro:
-    "I am a computer scientist working at the intersection of artificial intelligence and computer vision, with a focus on building models that reason reliably under uncertainty. My lab partners with clinical and industry collaborators to translate research into real-world systems.",
+    "I am an educator and social-service professional from Puducherry. As Founder & Managing Trustee of Benevolent Trust, I work on social service, fundraising, public awareness, and education, alongside my teaching as an Assistant Professor.",
   bio: [
-    "Dr. L. Vijayakumar is an educator, social-service professional, and community leader from Puducherry. He serves as the CEO of Benevolent Trust and works as an Assistant Professor at Saveetha University, Chennai. With years of experience in social service, fundraising, public awareness, and education, he is also associated with Benevolent International Journal of Multidisciplinary Research (BIJMR), supporting research and knowledge sharing across diverse academic fields.",
+    "Dr. L. Vijayakumar is an educator, social-service professional, and community leader from Puducherry. He is the Founder & Managing Trustee of Benevolent Trust, Puducherry, and works as an Assistant Professor at Veltech University, Chennai. With years of experience in social service, fundraising, public awareness, and education, he is also associated with Benevolent International Journal of Multidisciplinary Research (BIJMR), supporting research and knowledge sharing across diverse academic fields.",
   ],
   socials: {
     scholar: "https://scholar.google.com",
@@ -56,10 +50,10 @@ export const profile = {
 };
 
 export const researchAreas: ResearchArea[] = [
-  { name: "Artificial Intelligence" },
-  { name: "Machine Learning" },
-  { name: "Computer Vision" },
-  { name: "Data Science" },
+  { name: "Founder" },
+  { name: "Social Service" },
+  { name: "Professor" },
+  { name: "Community Development" },
 ];
 
 export const education: EducationItem[] = [
@@ -71,18 +65,10 @@ export const education: EducationItem[] = [
   { degree: "B.Com. (Bachelor of Commerce)", institution: "[College Name]" },
 ];
 
-export const experience: ExperienceItem[] = [
-  { role: "Professor of Computer Science", institution: "Meridian Institute of Technology", period: "2018 – Present" },
-  { role: "Associate Professor", institution: "Meridian Institute of Technology", period: "2013 – 2018" },
-  { role: "Postdoctoral Researcher", institution: "Whitmore AI Institute", period: "2008 – 2012" },
-];
-
-export const stats: StatItem[] = [
-  { id: "publications", label: "Publications", value: "112" },
-  { id: "awards", label: "Awards", value: "18" },
-  { id: "experience", label: "Years of Experience", value: "17" },
-  { id: "projects", label: "Research Projects", value: "34" },
-];
+// Left empty deliberately: the previous figures were placeholder values, not
+// real ones. The Stats section stays out of the Profile page until Dr.
+// Vijayakumar supplies verified counts.
+export const stats: StatItem[] = [];
 
 export const awards: Award[] = [
   {
@@ -90,5 +76,10 @@ export const awards: Award[] = [
     name: "Distinguished Researcher Award",
     organization: "Presented by Shri. K. Lakshminarayanan",
     year: "2022",
+  },
+  {
+    id: "award-2",
+    name: "Publication and International Conference cum PRIMS Awards",
+    year: "2021",
   },
 ];

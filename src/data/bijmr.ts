@@ -157,7 +157,7 @@ export const editorialBoard: EditorialMember[] = [
     role: "Editor-in-Chief",
     affiliation: [
       "Assistant Professor, Veltech University, Chennai",
-      "Chief Executive Officer, Benevolent Trust, Puducherry",
+      "Founder & Managing Trustee, Benevolent Trust, Puducherry",
     ],
     email: "benevolenttrust@gmail.com",
     linkedin: "https://www.linkedin.com/in/vijay-kumar-7449361a8",

@@ -34,7 +34,9 @@ function RecentAwards() {
                 <h3 className="text-base font-bold leading-snug text-text-primary">
                   {award.name}
                 </h3>
-                <p className="mt-1.5 text-sm text-text-secondary">{award.organization}</p>
+                {award.organization && (
+                  <p className="mt-1.5 text-sm text-text-secondary">{award.organization}</p>
+                )}
                 <p className="mt-1 text-sm font-semibold text-primary">{award.year}</p>
               </div>
             </motion.div>
