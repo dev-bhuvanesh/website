@@ -35,8 +35,7 @@ function Hero() {
             {profile.university}
           </p>
           <p className="mt-1 text-base font-medium text-text-secondary">
-            {profile.secondaryRole.title}, {profile.secondaryRole.organization} —{" "}
-            {profile.secondaryRole.location}
+            {profile.secondaryRole.organization}, {profile.secondaryRole.location}
           </p>
 
           <ul className="mt-6 flex flex-wrap gap-2.5">

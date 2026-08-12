@@ -4,6 +4,7 @@ import { FiMenu, FiX } from "react-icons/fi";
 import { Link, useLocation } from "react-router-dom";
 import ThemeToggle from "../ThemeToggle";
 import { journal, navLinks } from "../../data/bijmr";
+import benevolentLogo from "../../assets/images/WhatsApp Image 2026-08-12 at 2.14.55 PM.jpeg";
 
 const SECTION_IDS = ["home", "about", "scope", "contact"];
 
@@ -61,9 +62,11 @@ function BijmrNavbar() {
     >
       <nav className="section flex h-20 items-center justify-between py-4">
         <Link to="/bijmr" className="flex items-center gap-2.5">
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold tracking-tight text-white">
-            {journal.shortName.slice(0, 2)}
-          </span>
+          <img 
+            src={benevolentLogo} 
+            alt="Benevolent Trust Logo"
+            className="h-9 w-9 rounded-full object-cover"
+          />
           <span className="text-lg font-bold tracking-tight text-primary transition-colors hover:text-accent">
             {journal.shortName}
           </span>

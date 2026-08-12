@@ -5,7 +5,7 @@ export interface ResearchArea {
 export interface EducationItem {
   degree: string;
   institution: string;
-  year: string;
+  year?: string;
 }
 
 export interface ExperienceItem {
@@ -30,14 +30,14 @@ export interface StatItem {
 export const profile = {
   name: "Dr. L. Vijayakumar",
   title: "Assistant Professor",
-  university: "Saveetha University, Chennai",
+  university: "Founder & Managing Trustee",
   secondaryRole: {
     title: "Chief Executive Officer",
     organization: "Benevolent Trust",
     location: "Puducherry",
   },
   department: "Department of Computer Science & Engineering",
-  office: "Pondicherry, Puducherry, India",
+  office: "Benevolent Trust, Puducherry",
   email: "benevolenttrust@gmail.com",
   phone: "+91 96293 16672",
   address: "Pondicherry, Puducherry, India",
@@ -63,9 +63,12 @@ export const researchAreas: ResearchArea[] = [
 ];
 
 export const education: EducationItem[] = [
-  { degree: "Ph.D. in Computer Science", institution: "Caltech Institute of Technology", year: "2008" },
-  { degree: "M.S. in Computer Science", institution: "University of Toronto", year: "2004" },
-  { degree: "B.S. in Mathematics & Computer Science", institution: "University of Edinburgh", year: "2002" },
+  { degree: "Ph.D. in Commerce", institution: "St. Joseph’s College, Cuddalore (Autonomous)" },
+  {
+    degree: "M.Com. (Master of Commerce)",
+    institution: "St. Joseph’s College, Cuddalore (Thiruvalluvar University)",
+  },
+  { degree: "B.Com. (Bachelor of Commerce)", institution: "[College Name]" },
 ];
 
 export const experience: ExperienceItem[] = [

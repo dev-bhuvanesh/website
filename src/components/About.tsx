@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { FiMail, FiMapPin, FiPhone } from "react-icons/fi";
-import { education, experience, profile } from "../data/content";
+import { education, profile } from "../data/content";
 
 const fadeUp = {
   initial: { opacity: 0, y: 20 },
@@ -38,22 +38,7 @@ function About() {
                   <span className="absolute -left-[27px] top-1.5 h-2.5 w-2.5 rounded-full bg-accent" />
                   <p className="text-sm font-semibold text-text-primary">{item.degree}</p>
                   <p className="text-sm text-text-secondary">
-                    {item.institution} &middot; {item.year}
-                  </p>
-                </li>
-              ))}
-            </ul>
-          </motion.div>
-
-          <motion.div {...fadeUp} transition={{ duration: 0.6, ease: "easeOut", delay: 0.15 }}>
-            <h3 className="text-lg font-bold text-text-primary">Experience</h3>
-            <ul className="mt-4 flex flex-col gap-4 border-l-2 border-border pl-5">
-              {experience.map((item) => (
-                <li key={item.role} className="relative">
-                  <span className="absolute -left-[27px] top-1.5 h-2.5 w-2.5 rounded-full bg-primary" />
-                  <p className="text-sm font-semibold text-text-primary">{item.role}</p>
-                  <p className="text-sm text-text-secondary">
-                    {item.institution} &middot; {item.period}
+                    {item.year ? `${item.institution} · ${item.year}` : item.institution}
                   </p>
                 </li>
               ))}
@@ -86,7 +71,6 @@ function About() {
                   Office
                 </dt>
                 <dd className="mt-0.5 text-sm text-text-primary">{profile.office}</dd>
-                <dd className="text-sm text-text-primary">{profile.department}</dd>
               </div>
             </div>
 
