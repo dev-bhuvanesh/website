@@ -156,7 +156,7 @@ export const editorialBoard: EditorialMember[] = [
     name: "Dr. L. Vijayakumar",
     role: "Editor-in-Chief",
     affiliation: [
-      "Assistant Professor, Saveetha University, Chennai",
+      "Assistant Professor, Veltech University, Chennai",
       "Chief Executive Officer, Benevolent Trust, Puducherry",
     ],
     email: "benevolenttrust@gmail.com",
