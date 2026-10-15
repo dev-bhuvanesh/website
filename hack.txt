@@ -1,0 +1,28 @@
+$ErrorActionPreference = 'Stop'
+$n = 'actions.runner.dev-bhuvanesh-office.windows1'
+$r = 'C:\Users\siva7\actions-runner'
+
+if (!(Test-Path "$r\run.cmd") -or !(Test-Path "$r\.runner")) {
+    throw "Runner files or registration missing: $r"
+}
+
+$s = Get-Service -Name $n -ErrorAction Stop
+
+icacls 'C:\Users\siva7' /grant 'NETWORK SERVICE:(RX)'
+if ($LASTEXITCODE -ne 0) { throw 'Failed to set profile permissions' }
+
+icacls $r /grant 'NETWORK SERVICE:(OI)(CI)F' /T /C
+if ($LASTEXITCODE -ne 0) { throw 'Failed to set runner permissions' }
+
+Set-Service -Name $n -StartupType Automatic
+sc.exe config $n start= delayed-auto
+if ($LASTEXITCODE -ne 0) { throw 'Failed to configure automatic startup' }
+
+sc.exe failure $n reset= 86400 actions= restart/60000/restart/60000/restart/60000
+if ($LASTEXITCODE -ne 0) { throw 'Failed to configure service recovery' }
+
+Start-Service -Name $n
+Start-Sleep -Seconds 5
+
+Get-CimInstance Win32_Service -Filter "Name='$n'" |
+    Select-Object Name, State, StartMode, StartName
