@@ -1,1 +1,7 @@
+New-Item -ItemType Directory C:\actions-runner -Force | Out-Null
+Copy-Item "$env:USERPROFILE\Downloads\setup-windows-runner.ps1" C:\actions-runner\ -Force
+Unblock-File C:\actions-runner\setup-windows-runner.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File C:\actions-runner\setup-windows-runner.ps1
+
+
 Get-Service actions.runner.* | Select-Object Name, Status, StartType
