@@ -24,6 +24,17 @@ if (-not $principal.IsInRole(
 
 Write-Host "`n=== GitHub Actions Runner Setup ===" -ForegroundColor Cyan
 
+# Ask for the runner name
+do {
+    $runnerName = (Read-Host 'Enter a name for this PC runner (e.g. Office-PC)').Trim()
+
+    if ([string]::IsNullOrWhiteSpace($runnerName)) {
+        Write-Host 'Runner name cannot be empty.' -ForegroundColor Yellow
+    }
+} while ([string]::IsNullOrWhiteSpace($runnerName))
+
+Write-Host "Selected runner name: $runnerName" -ForegroundColor Green
+
 # 1. Create/download/extract only when needed
 if (-not (Test-Path "$r\run.cmd")) {
     New-Item -ItemType Directory -Path $r -Force | Out-Null
@@ -45,14 +56,20 @@ if (-not (Test-Path "$r\.runner")) {
     Write-Host 'A new runner registration is required.'
     Write-Host "Generate a fresh token at: $repo/settings/actions/runners/new"
 
-    $token = Read-Host 'Enter the fresh GitHub registration token'
+    $token = Read-Host 'Enter the fresh GitHub runner registration token'
+
     if ([string]::IsNullOrWhiteSpace($token)) {
         throw 'No registration token entered.'
     }
 
     Push-Location $r
     try {
-        & .\config.cmd --url $repo --token $token --runasservice
+        & .\config.cmd `
+            --url $repo `
+            --token $token `
+            --name $runnerName `
+            --runasservice
+
         if ($LASTEXITCODE -ne 0) {
             throw 'Runner configuration failed. Check the output above.'
         }
@@ -64,10 +81,12 @@ if (-not (Test-Path "$r\.runner")) {
 }
 else {
     Write-Host 'Existing runner registration found; preserving it.'
+    Write-Host "The entered name applies only to a new registration."
 }
 
 # 3. Find the service associated with this runner folder
 $escapedPath = [regex]::Escape($r)
+
 $svc = Get-CimInstance Win32_Service |
     Where-Object {
         $_.PathName -match $escapedPath -and
@@ -76,12 +95,13 @@ $svc = Get-CimInstance Win32_Service |
     Select-Object -First 1
 
 if (-not $svc) {
-    throw "No installed runner service found for $r. No existing registration was removed."
+    throw "No installed runner service found for $r. Check the runner service installation."
 }
 
 # 4. Grant runner-folder access if service uses NETWORK SERVICE
 if ($svc.StartName -match 'NETWORK SERVICE') {
     & icacls.exe $r /grant 'NETWORK SERVICE:(OI)(CI)F' /T /C
+
     if ($LASTEXITCODE -ne 0) {
         throw 'Runner folder permissions could not be fully applied.'
     }
@@ -92,7 +112,7 @@ Set-Service -Name $svc.Name -StartupType Automatic
 
 & sc.exe config $svc.Name start= delayed-auto
 if ($LASTEXITCODE -ne 0) {
-    throw 'Could not configure delayed automatic startup.'
+    throw 'Could not configure automatic startup.'
 }
 
 # 6. Restart service after failures
@@ -102,8 +122,9 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 # 7. Start the service
-$svc = Get-Service -Name $svc.Name
-if ($svc.Status -eq 'Running') {
+$serviceStatus = Get-Service -Name $svc.Name
+
+if ($serviceStatus.Status -eq 'Running') {
     Write-Host 'Runner service is already running.'
 }
 else {
