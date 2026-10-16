@@ -1,3 +1,8 @@
+# Paste ALL of this into PowerShell opened as Administrator.
+# It saves the setup script to C:\actions-runner\setup-windows-runner.ps1 and runs it.
+New-Item -ItemType Directory -Path C:\actions-runner -Force | Out-Null
+$f = 'C:\actions-runner\setup-windows-runner.ps1'
+@'
 <#
 .SYNOPSIS
   One-command, re-runnable setup and repair for the self-hosted GitHub Actions
@@ -18,7 +23,9 @@
     7. Sleep              PC sleeping while a job runs
     8. Runner files       download + SHA-256 check against the official release notes
     9. Runner service     starts at boot (delayed auto start), restarts on failure,
-                          runs as YOUR account so per-user tools are visible,
+                          runs as NETWORK SERVICE (no password needed; it gets
+                          read-only access to your Python and modify access to
+                          the runner folder), or as your account with -RunAs User,
                           replaces an interactive run.cmd window
    10. Job PATH           writes PATH into the runner's .env (and .path) so jobs see Python/Git
    11. Labels + online    makes sure the runner has its labels and is Online
@@ -44,8 +51,9 @@ param(
     [string[]] $Labels        = @('writer'),
     [string]   $RunnerVersion = '2.337.0',
     [string[]] $DevDirs       = @('C:\dev'),
-    [ValidateSet('User', 'NetworkService')]
-    [string]   $RunAs         = 'User',
+    # NetworkService (default): no password needed. User: runs as your account (asks for your password).
+    [ValidateSet('NetworkService', 'User')]
+    [string]   $RunAs         = 'NetworkService',
     [switch]   $SkipToolInstall,
     [switch]   $SkipDnsFix,
     [switch]   $NoPowerChange,
@@ -393,8 +401,13 @@ if ($isUserPython) {
         Update-SessionPath
     }
     if ($RunAs -eq 'NetworkService') {
-        throw ("Python is installed only for your user, so the NETWORK SERVICE account cannot see it.`n" +
-               "Run again with -RunAs User (recommended) or install Python for all users.")
+        # The service account can't read your profile by default. Give it read +
+        # execute (never write) on just the Python folder, so no password is needed.
+        # (S-1-5-20 = NETWORK SERVICE on every Windows language; granting again is harmless.)
+        $pyRoot = $py.Dir
+        $g = Invoke-Native { icacls.exe $pyRoot /grant '*S-1-5-20:(OI)(CI)RX' /T /C /Q }
+        if ($g.Code -ne 0) { throw "Could not give NETWORK SERVICE read access to $pyRoot." }
+        Write-Ok "NETWORK SERVICE can read and run Python in $pyRoot (read-only)."
     }
 }
 $alias = Get-Command python.exe -ErrorAction SilentlyContinue | Select-Object -First 1
@@ -545,6 +558,14 @@ if ($listeners.Count -gt 0 -and -not $svcRunning) {
 
 $needConfigure = (-not $isRegistered) -or (-not $svc) -or (-not $accountOk)
 
+# NETWORK SERVICE needs modify rights on the runner folder (including files that
+# earlier run.cmd sessions created as your user) before the service starts.
+if ($RunAs -eq 'NetworkService') {
+    $g = Invoke-Native { icacls.exe $RunnerDir /grant '*S-1-5-20:(OI)(CI)M' /T /C /Q }
+    if ($g.Code -ne 0) { Write-Warn2 "Some files in $RunnerDir could not be updated for NETWORK SERVICE (icacls exit $($g.Code))." }
+    else { Write-Ok "NETWORK SERVICE has modify access to $RunnerDir." }
+}
+
 if (-not $needConfigure) {
     Write-Ok "Registered, service '$($svc.Name)' runs as $($svc.StartName)."
 } else {
@@ -578,16 +599,31 @@ if (-not $needConfigure) {
     $tok = Get-RunnerToken 'registration-token'
     $cfgArgs = @('--token', $tok) + $cfgArgs
     Push-Location $RunnerDir
+    $secrets = @($tok, $pwdPlain) | Where-Object { $_ }
     try { $cr = Invoke-Native { & .\config.cmd @cfgArgs } } finally { Pop-Location; $tok = $null; $pwdPlain = $null; $cfgArgs = $null }
-    $cr.Out | Where-Object { $_ -notmatch 'password|token' } | ForEach-Object { Write-Host "         $_" }
-    if ($cr.Code -ne 0) { throw 'Runner configuration failed (output above). Common causes: wrong password, expired token.' }
+    # Show every line (errors matter), but mask the secret values themselves.
+    foreach ($line in $cr.Out) {
+        $shown = $line
+        foreach ($s in $secrets) { $shown = $shown.Replace($s, '***') }
+        Write-Host "         $shown"
+    }
+    $secrets = $null
+    $diag = Get-ChildItem (Join-Path $RunnerDir '_diag') -Filter 'Runner_*.log' -ErrorAction SilentlyContinue |
+            Sort-Object LastWriteTime -Descending | Select-Object -First 1
+    if ($cr.Code -ne 0 -and $diag) {
+        Write-Host "    Last errors from $($diag.FullName):" -ForegroundColor Yellow
+        Get-Content $diag.FullName | Select-String -Pattern 'ERR|Exception|denied|logon' | Select-Object -Last 15 |
+            ForEach-Object { Write-Host "         $($_.Line)" }
+    }
+    if ($cr.Code -ne 0) {
+        throw ("Runner configuration failed (output above). Common causes:`n" +
+               "  - wrong password (Microsoft account: use its password, not your PIN)`n" +
+               "  - 'Only allow Windows Hello sign-in' is on: Settings > Accounts > Sign-in options > turn it off`n" +
+               "  - expired token (just run the script again)")
+    }
     $svc = Get-RunnerService
     if (-not $svc) { throw 'Configuration finished but no runner service was created.' }
     Write-Fix "Service '$($svc.Name)' installed, running as $($svc.StartName)."
-}
-
-if ($RunAs -eq 'NetworkService') {
-    $null = Invoke-Native { icacls.exe $RunnerDir /grant 'NETWORK SERVICE:(OI)(CI)M' /T /C /Q }
 }
 
 # ---------------------------------------------------------------------------
@@ -666,3 +702,5 @@ finally {
     Write-Host "Log saved to $logFile"
     Stop-Transcript | Out-Null
 }
+'@ | Set-Content -Path $f -Encoding UTF8
+powershell -NoProfile -ExecutionPolicy Bypass -File $f
